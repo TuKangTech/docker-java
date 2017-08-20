@@ -20,12 +20,13 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@Test(groups = "swarm-integration")
+@Test(groups = "integration")
 public class InitializeSwarmCmdExecTest extends AbstractNettySwarmDockerClientTest {
 
     public static final Logger LOG = LoggerFactory.getLogger(InitializeSwarmCmdExecTest.class);
@@ -54,11 +55,11 @@ public class InitializeSwarmCmdExecTest extends AbstractNettySwarmDockerClientTe
         SwarmSpec swarmSpec = new SwarmSpec()
                 .withName("swarm")
                 .withDispatcher(new SwarmDispatcherConfig()
-                        .withHeartbeatPeriod(10000000L)
+                        .withHeartbeatPeriod(10000000)
                 ).withOrchestration(new SwarmOrchestration()
                         .withTaskHistoryRententionLimit(100)
                 ).withCaConfig(new SwarmCAConfig()
-                        .withNodeCertExpiry(60 * 60 * 1000000000L /*ns */))
+                        .withNodeCertExpiry(60 * 60 * 1000000000L))
                 .withRaft(new SwarmRaftConfig()
                         .withElectionTick(8)
                         .withSnapshotInterval(20000)

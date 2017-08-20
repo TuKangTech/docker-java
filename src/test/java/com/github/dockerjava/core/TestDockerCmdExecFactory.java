@@ -1,7 +1,7 @@
 package com.github.dockerjava.core;
 
 import com.github.dockerjava.api.async.ResultCallback;
-import com.github.dockerjava.api.command.AttachContainerCmd;
+import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.command.AuthCmd.Exec;
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.command.CommitCmd;
@@ -25,23 +25,17 @@ import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
-import com.github.dockerjava.api.command.InitializeSwarmCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectExecCmd;
 import com.github.dockerjava.api.command.InspectImageCmd;
 import com.github.dockerjava.api.command.InspectNetworkCmd;
 import com.github.dockerjava.api.command.InspectServiceCmd;
-import com.github.dockerjava.api.command.InspectSwarmCmd;
-import com.github.dockerjava.api.command.InspectSwarmNodeCmd;
 import com.github.dockerjava.api.command.InspectVolumeCmd;
-import com.github.dockerjava.api.command.JoinSwarmCmd;
 import com.github.dockerjava.api.command.KillContainerCmd;
-import com.github.dockerjava.api.command.LeaveSwarmCmd;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.ListImagesCmd;
 import com.github.dockerjava.api.command.ListNetworksCmd;
 import com.github.dockerjava.api.command.ListServicesCmd;
-import com.github.dockerjava.api.command.ListSwarmNodesCmd;
 import com.github.dockerjava.api.command.ListVolumesCmd;
 import com.github.dockerjava.api.command.LoadImageCmd;
 import com.github.dockerjava.api.command.LogContainerCmd;
@@ -53,7 +47,6 @@ import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RemoveImageCmd;
 import com.github.dockerjava.api.command.RemoveNetworkCmd;
 import com.github.dockerjava.api.command.RemoveServiceCmd;
-import com.github.dockerjava.api.command.RemoveSwarmNodeCmd;
 import com.github.dockerjava.api.command.RemoveVolumeCmd;
 import com.github.dockerjava.api.command.RenameContainerCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
@@ -67,8 +60,6 @@ import com.github.dockerjava.api.command.TopContainerCmd;
 import com.github.dockerjava.api.command.UnpauseContainerCmd;
 import com.github.dockerjava.api.command.UpdateContainerCmd;
 import com.github.dockerjava.api.command.UpdateServiceCmd;
-import com.github.dockerjava.api.command.UpdateSwarmCmd;
-import com.github.dockerjava.api.command.UpdateSwarmNodeCmd;
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
 import com.github.dockerjava.api.model.BuildResponseItem;
@@ -318,7 +309,7 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
     }
 
     @Override
-    public RenameContainerCmd.Exec createRenameContainerCmdExec() {
+    public RenameContainerCmd.Exec createRenameContainerCmdExec(){
         return delegate.createRenameContainerCmdExec();
     }
 
@@ -441,7 +432,6 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
         return delegate.createDisconnectFromNetworkCmdExec();
     }
 
-    // swarm
     @Override
     public InitializeSwarmCmd.Exec createInitializeSwarmCmdExec() {
         return delegate.createInitializeSwarmCmdExec();
@@ -467,7 +457,6 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
         return delegate.createUpdateSwarmCmdExec();
     }
 
-    // services
     @Override
     public ListServicesCmd.Exec createListServicesCmdExec() {
         return delegate.createListServicesCmdExec();
@@ -493,25 +482,34 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
         return delegate.createRemoveServiceCmdExec();
     }
 
-    // nodes
     @Override
-    public ListSwarmNodesCmd.Exec listSwarmNodeCmdExec() {
-        return delegate.listSwarmNodeCmdExec();
+    public ListTasksCmd.Exec createListTasksCmdExec() {
+        return delegate.createListTasksCmdExec();
     }
 
     @Override
-    public InspectSwarmNodeCmd.Exec inspectSwarmNodeCmdExec() {
-        return delegate.inspectSwarmNodeCmdExec();
+    public InspectTaskCmd.Exec createInspectTaskCmdExec() {
+        return delegate.createInspectTaskCmdExec();
     }
 
     @Override
-    public RemoveSwarmNodeCmd.Exec removeSwarmNodeCmdExec() {
-        return delegate.removeSwarmNodeCmdExec();
+    public ListSwarmNodesCmd.Exec createListSwarmNodeCmdExec() {
+        return delegate.createListSwarmNodeCmdExec();
     }
 
     @Override
-    public UpdateSwarmNodeCmd.Exec updateSwarmNodeCmdExec() {
-        return delegate.updateSwarmNodeCmdExec();
+    public InspectSwarmNodeCmd.Exec createInspectSwarmNodeExec() {
+        return delegate.createInspectSwarmNodeExec();
+    }
+
+    @Override
+    public RemoveSwarmNodeCmd.Exec createRemoveSwarmNodeCmdExec() {
+        return delegate.createRemoveSwarmNodeCmdExec();
+    }
+
+    @Override
+    public UpdateSwarmNodeCmd.Exec createUpdateSwarmNodeCmdExec() {
+        return delegate.createUpdateSwarmNodeCmdExec();
     }
 
     public List<String> getContainerNames() {

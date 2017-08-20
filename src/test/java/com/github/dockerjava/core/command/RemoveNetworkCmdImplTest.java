@@ -9,7 +9,6 @@ import org.hamcrest.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
-import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
@@ -19,7 +18,6 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static com.github.dockerjava.utils.TestUtils.isSwarm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -53,7 +51,6 @@ public class RemoveNetworkCmdImplTest extends AbstractDockerClientTest {
 
     @Test(groups = "ignoreInCircleCi")
     public void removeNetwork() throws DockerException {
-        if (isSwarm(dockerClient)) throw new SkipException("Swarm has no network");
 
         CreateNetworkResponse network = dockerClient.createNetworkCmd().withName("test-network").exec();
 
@@ -69,7 +66,6 @@ public class RemoveNetworkCmdImplTest extends AbstractDockerClientTest {
 
     @Test(expectedExceptions = NotFoundException.class)
     public void removeNonExistingContainer() throws DockerException {
-        if (isSwarm(dockerClient)) throw new SkipException("Swarm has no network");
 
         dockerClient.removeNetworkCmd("non-existing").exec();
     }

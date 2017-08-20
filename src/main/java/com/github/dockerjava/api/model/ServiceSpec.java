@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @since {@link RemoteApiVersion#VERSION_1_24}
@@ -22,6 +23,12 @@ public class ServiceSpec implements Serializable {
      */
     @JsonProperty("Name")
     private String name;
+
+    /**
+     * @since 1.24
+     */
+    @JsonProperty("Labels")
+    private Map labels;
 
     /**
      * @since 1.24
@@ -44,7 +51,7 @@ public class ServiceSpec implements Serializable {
     /**
      * @since 1.24
      */
-    @JsonProperty("Networks")
+    @JsonProperty("Configs")
     private List<NetworkAttachmentConfig> networks;
 
     /**
@@ -52,6 +59,21 @@ public class ServiceSpec implements Serializable {
      */
     @JsonProperty("EndpointSpec")
     private EndpointSpec endpointSpec;
+
+    /**
+     * @see #name
+     */
+    public Map getLabels() {
+        return labels;
+    }
+
+    /**
+     * @see #name
+     */
+    public ServiceSpec withLabels(Map labels) {
+        this.labels = labels;
+        return this;
+    }
 
     /**
      * @see #name
@@ -67,6 +89,8 @@ public class ServiceSpec implements Serializable {
         this.name = name;
         return this;
     }
+
+
 
     /**
      * @see #taskTemplate

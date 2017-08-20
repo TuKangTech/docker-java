@@ -9,8 +9,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 import javax.annotation.CheckForNull;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The specification for containers as used in {@link TaskSpec}
@@ -36,7 +35,7 @@ public class ContainerSpec implements Serializable {
      * @since 1.24
      */
     @JsonProperty("Command")
-    private String command;
+    private List<String> command;
 
     /**
      * @since 1.24
@@ -122,14 +121,14 @@ public class ContainerSpec implements Serializable {
      * @see #command
      */
     @CheckForNull
-    public String getCommand() {
+    public List<String> getCommand() {
         return command;
     }
 
     /**
      * @see #command
      */
-    public ContainerSpec withCommand(String command) {
+    public ContainerSpec withCommand(List<String> command) {
         this.command = command;
         return this;
     }

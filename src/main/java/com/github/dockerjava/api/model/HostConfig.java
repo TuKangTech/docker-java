@@ -194,12 +194,6 @@ public class HostConfig implements Serializable {
     @JsonProperty("ShmSize")
     private Long shmSize;
 
-    /**
-     * @since ~{@link RemoteApiVersion#VERSION_1_23}
-     */
-    @JsonProperty("PidsLimit")
-    private Long pidsLimit;
-
 
     @JsonIgnore
     public Bind[] getBinds() {
@@ -419,14 +413,6 @@ public class HostConfig implements Serializable {
     @CheckForNull
     public String getVolumeDriver() {
         return volumeDriver;
-    }
-
-    /**
-     * @see #pidsLimit
-     */
-    @CheckForNull
-    public Long getPidsLimit() {
-        return pidsLimit;
     }
 
     /**
@@ -806,14 +792,6 @@ public class HostConfig implements Serializable {
      */
     public HostConfig withVolumesFrom(VolumesFrom[] volumesFrom) {
         this.volumesFrom = volumesFrom;
-        return this;
-    }
-
-    /**
-     * @see #pidsLimit
-     */
-    public HostConfig withPidsLimit(Long pidsLimit) {
-        this.pidsLimit = pidsLimit;
         return this;
     }
     // end of auto-generated

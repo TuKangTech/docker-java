@@ -32,7 +32,7 @@ public class SwarmNodeEngineDescription implements Serializable {
      * @since 1.24
      */
     @JsonProperty("Labels")
-    private Map<String, String> labels;
+    private Map<String,String> labels;
 
     /**
      * @since 1.24

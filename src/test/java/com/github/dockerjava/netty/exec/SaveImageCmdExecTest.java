@@ -47,9 +47,8 @@ public class SaveImageCmdExecTest extends AbstractNettyDockerClientTest {
     @Test
     public void saveImage() throws Exception {
 
-        try (InputStream image = dockerClient.saveImageCmd("busybox").exec()) {
-            assertThat(image.available(), greaterThan(0));
-        }
+        InputStream image = IOUtils.toBufferedInputStream(dockerClient.saveImageCmd("busybox").exec());
+        assertThat(image.available(), greaterThan(0));
 
     }
 

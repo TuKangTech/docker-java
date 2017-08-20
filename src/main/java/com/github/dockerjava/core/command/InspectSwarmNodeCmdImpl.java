@@ -1,10 +1,12 @@
 package com.github.dockerjava.core.command;
 
+import com.github.dockerjava.api.command.DockerCmdSyncExec;
 import com.github.dockerjava.api.command.InspectSwarmNodeCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.SwarmNode;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

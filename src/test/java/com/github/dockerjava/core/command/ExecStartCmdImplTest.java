@@ -1,24 +1,23 @@
 package com.github.dockerjava.core.command;
 
-import static com.github.dockerjava.utils.TestUtils.isSwarm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 
-import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.ExecCreateCmdResponse;
-import com.github.dockerjava.api.exception.NotFoundException;
-import com.github.dockerjava.client.AbstractDockerClientTest;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
+
 import org.testng.ITestResult;
-import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.ExecCreateCmdResponse;
+import com.github.dockerjava.client.AbstractDockerClientTest;
 
 @Test(groups = "integration")
 public class ExecStartCmdImplTest extends AbstractDockerClientTest {
@@ -44,9 +43,6 @@ public class ExecStartCmdImplTest extends AbstractDockerClientTest {
 
     @Test(groups = "ignoreInCircleCi")
     public void execStart() throws Exception {
-        //FIXME swarm
-        if (isSwarm(dockerClient)) throw new SkipException("FIXME Swarm");
-
         String containerName = "generated_" + new SecureRandom().nextInt();
 
         CreateContainerResponse container = dockerClient.createContainerCmd("busybox").withCmd("top")
@@ -57,7 +53,7 @@ public class ExecStartCmdImplTest extends AbstractDockerClientTest {
         dockerClient.startContainerCmd(container.getId()).exec();
 
         ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(container.getId())
-                .withAttachStdout(true).withCmd("touch", "/execStartTest.log").withUser("root").exec();
+                .withAttachStdout(true).withCmd("touch", "/execStartTest.log").exec();
         dockerClient.execStartCmd(execCreateCmdResponse.getId()).exec(
                 new ExecStartResultCallback(System.out, System.err)).awaitCompletion();
 
@@ -95,24 +91,5 @@ public class ExecStartCmdImplTest extends AbstractDockerClientTest {
         String responseAsString = asString(response);
         assertNotNull(responseAsString);
         assertTrue(responseAsString.length() > 0);
-    }
-
-    @Test(groups = "ignoreInCircleCi", expectedExceptions = NotFoundException.class)
-    public void execStartWithNonExistentUser() throws Exception {
-        String containerName = "generated_" + new SecureRandom().nextInt();
-
-        CreateContainerResponse container = dockerClient.createContainerCmd("busybox").withCmd("sleep", "9999")
-                .withName(containerName).exec();
-        LOG.info("Created container {}", container.toString());
-        assertThat(container.getId(), not(isEmptyString()));
-
-        dockerClient.startContainerCmd(container.getId()).exec();
-
-        ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(container.getId())
-                .withAttachStdout(true).withCmd("touch", "/execStartTest.log").withUser("NonExistentUser").exec();
-        dockerClient.execStartCmd(execCreateCmdResponse.getId()).withDetach(false).withTty(true)
-                .exec(new ExecStartResultCallback(System.out, System.err)).awaitCompletion();
-
-        dockerClient.copyArchiveFromContainerCmd(container.getId(), "/execStartTest.log").exec();
     }
 }

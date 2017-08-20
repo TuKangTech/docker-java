@@ -18,20 +18,9 @@ import javax.annotation.Nonnull;
 public class UpdateServiceCmdImpl extends AbstrDockerCmd<UpdateServiceCmd, Void>
         implements UpdateServiceCmd {
 
-    /**
-     * @since 1.24
-     */
     private String serviceId;
 
-    /**
-     * @since 1.24
-     */
     private ServiceSpec serviceSpec;
-
-    /**
-     * @since 1.24
-     */
-    private Long version;
 
     public UpdateServiceCmdImpl(Exec exec, String serviceId, ServiceSpec serviceSpec) {
         super(exec);
@@ -68,22 +57,6 @@ public class UpdateServiceCmdImpl extends AbstrDockerCmd<UpdateServiceCmd, Void>
      */
     public UpdateServiceCmd withServiceSpec(ServiceSpec serviceSpec) {
         this.serviceSpec = serviceSpec;
-        return this;
-    }
-
-    /**
-     * @see #version
-     */
-    @CheckForNull
-    public Long getVersion() {
-        return version;
-    }
-
-    /**
-     * @see #version
-     */
-    public UpdateServiceCmdImpl withVersion(Long version) {
-        this.version = version;
         return this;
     }
 

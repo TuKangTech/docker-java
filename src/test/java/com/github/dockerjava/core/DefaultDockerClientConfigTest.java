@@ -2,15 +2,12 @@ package com.github.dockerjava.core;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +18,6 @@ import org.testng.annotations.Test;
 
 import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.api.model.AuthConfig;
-import com.github.dockerjava.api.model.AuthConfigurations;
-import com.google.common.io.Resources;
 
 public class DefaultDockerClientConfigTest {
 
@@ -107,7 +102,7 @@ public class DefaultDockerClientConfigTest {
         DefaultDockerClientConfig config = buildConfig(Collections.<String, String> emptyMap(), systemProperties);
 
         // then the cert path is as expected
-        assertEquals(config.getDockerHost(), URI.create("unix:///var/run/docker.sock"));
+        assertEquals(config.getDockerHost(), URI.create("tcp://127.0.0.1:2375"));
         assertEquals(config.getRegistryUsername(), "someUserName");
         assertEquals(config.getRegistryUrl(), AuthConfig.DEFAULT_SERVER_ADDRESS);
         assertEquals(config.getApiVersion(), RemoteApiVersion.unknown());
@@ -204,38 +199,6 @@ public class DefaultDockerClientConfigTest {
 
         builder.withDockerTlsVerify("1");
         assertThat((Boolean) field.get(builder), is(true));
-    }
-
-    @Test
-    public void testGetAuthConfigurationsFromDockerCfg() throws URISyntaxException {
-        File cfgFile = new File(Resources.getResource("com.github.dockerjava.core/registry.v1").toURI());
-        DefaultDockerClientConfig clientConfig = new DefaultDockerClientConfig(URI.create(
-            "unix://foo"), cfgFile.getAbsolutePath(), "apiVersion", "registryUrl", "registryUsername", "registryPassword",
-            "registryEmail", null);
-
-        AuthConfigurations authConfigurations = clientConfig.getAuthConfigurations();
-        assertThat(authConfigurations, notNullValue());
-        assertThat(authConfigurations.getConfigs().get("https://test.docker.io/v1/"), notNullValue());
-
-        AuthConfig authConfig = authConfigurations.getConfigs().get("https://test.docker.io/v1/");
-        assertThat(authConfig.getUsername(), equalTo("user"));
-        assertThat(authConfig.getPassword(), equalTo("password"));
-    }
-
-    @Test
-    public void testGetAuthConfigurationsFromConfigJson() throws URISyntaxException {
-        File cfgFile = new File(Resources.getResource("com.github.dockerjava.core/registry.v2").toURI());
-        DefaultDockerClientConfig clientConfig = new DefaultDockerClientConfig(URI.create(
-            "unix://foo"), cfgFile.getAbsolutePath(), "apiVersion", "registryUrl", "registryUsername", "registryPassword",
-            "registryEmail", null);
-
-        AuthConfigurations authConfigurations = clientConfig.getAuthConfigurations();
-        assertThat(authConfigurations, notNullValue());
-        assertThat(authConfigurations.getConfigs().get("https://test.docker.io/v2/"), notNullValue());
-
-        AuthConfig authConfig = authConfigurations.getConfigs().get("https://test.docker.io/v2/");
-        assertThat(authConfig.getUsername(), equalTo("user"));
-        assertThat(authConfig.getPassword(), equalTo("password"));
     }
 
 }

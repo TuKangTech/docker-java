@@ -76,7 +76,7 @@ public class PullImageCmdImplTest extends AbstractDockerClientTest {
         // pulled down, preferably small in size. If tag is not used pull will
         // download all images in that repository but tmpImgs will only
         // deleted 'latest' image but not images with other tags
-        String testImage = "hackmann/empty";
+        String testImage = "ubuntu";
 
         LOG.info("Removing image: {}", testImage);
 

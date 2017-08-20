@@ -1,6 +1,5 @@
 package com.github.dockerjava.netty.exec;
 
-import com.beust.jcommander.internal.Lists;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.api.exception.NotAcceptableException;
@@ -25,7 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@Test(groups = "swarm-integration")
+@Test(groups = "integration")
 public class JoinSwarmCmdExecTest extends AbstractNettySwarmDockerClientTest {
 
     public static final Logger LOG = LoggerFactory.getLogger(JoinSwarmCmdExecTest.class);
@@ -71,7 +70,7 @@ public class JoinSwarmCmdExecTest extends AbstractNettySwarmDockerClientTest {
         SwarmJoinTokens tokens = initSwarmOnDocker(docker1);
 
         docker2.joinSwarmCmd()
-                .withRemoteAddrs(Lists.newArrayList("docker1" ))
+                .withRemoteAddrs(new String[] { "docker1" })
                 .withJoinToken(tokens.getWorker())
                 .exec();
         LOG.info("docker2 joined docker1's swarm");
@@ -89,7 +88,7 @@ public class JoinSwarmCmdExecTest extends AbstractNettySwarmDockerClientTest {
         SwarmJoinTokens tokens = initSwarmOnDocker(docker1);
 
         docker2.joinSwarmCmd()
-                .withRemoteAddrs(Lists.newArrayList("docker1"))
+                .withRemoteAddrs(new String[] { "docker1" })
                 .withJoinToken(tokens.getManager())
                 .exec();
         LOG.info("docker2 joined docker1's swarm");
@@ -109,7 +108,7 @@ public class JoinSwarmCmdExecTest extends AbstractNettySwarmDockerClientTest {
         initSwarmOnDocker(docker2);
 
         docker2.joinSwarmCmd()
-                .withRemoteAddrs(Lists.<String>newArrayList("docker1"))
+                .withRemoteAddrs(new String[] { "docker1" })
                 .withJoinToken(tokens.getWorker())
                 .exec();
     }

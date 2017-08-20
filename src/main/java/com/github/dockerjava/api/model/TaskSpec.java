@@ -2,6 +2,7 @@ package com.github.dockerjava.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.dockerjava.core.RemoteApiVersion;
+import com.sun.corba.se.impl.presentation.rmi.IDLNameTranslatorImpl;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,6 +35,9 @@ public class TaskSpec implements Serializable {
     @JsonProperty("RestartPolicy")
     private ServiceRestartPolicy restartPolicy;
 
+    @JsonProperty("ForceUpdate")
+    private Integer forceUpdate;
+
     /**
      * @since 1.24
      */
@@ -50,6 +54,21 @@ public class TaskSpec implements Serializable {
      * @see #containerSpec
      */
     @CheckForNull
+    public Integer getForceUpdate() {
+        return forceUpdate;
+    }
+
+    /**
+     * @see #containerSpec
+     */
+    public void withForceUpdate(Integer forceUpdate) {
+        this.forceUpdate = forceUpdate;
+    }
+
+    /**
+     * @see #containerSpec
+     */
+    @CheckForNull
     public ContainerSpec getContainerSpec() {
         return containerSpec;
     }
@@ -57,9 +76,8 @@ public class TaskSpec implements Serializable {
     /**
      * @see #containerSpec
      */
-    public TaskSpec withContainerSpec(ContainerSpec containerSpec) {
+    public void withContainerSpec(ContainerSpec containerSpec) {
         this.containerSpec = containerSpec;
-        return this;
     }
 
     /**

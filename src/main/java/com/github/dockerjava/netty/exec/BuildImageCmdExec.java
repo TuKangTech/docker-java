@@ -1,5 +1,6 @@
 package com.github.dockerjava.netty.exec;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,11 +14,13 @@ import com.github.dockerjava.netty.InvocationBuilder;
 import com.github.dockerjava.netty.MediaType;
 import com.github.dockerjava.netty.WebTarget;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import java.io.IOException;
 
 public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, BuildResponseItem> implements
         BuildImageCmd.Exec {
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildImageCmdExec.class);
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public BuildImageCmdExec(WebTarget baseResource, DockerClientConfig dockerClientConfig) {
         super(baseResource, dockerClientConfig);
@@ -51,17 +54,9 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
         if (dockerFilePath != null && command.getRemote() == null && !"Dockerfile".equals(dockerFilePath)) {
             webTarget = webTarget.queryParam("dockerfile", dockerFilePath);
         }
-
-        if (command.getTags() != null && !command.getTags().isEmpty()) {
-            webTarget = webTarget.queryParamsSet("t", command.getTags());
-        } else if (isNotBlank(command.getTag())) {
+        if (command.getTag() != null) {
             webTarget = webTarget.queryParam("t", command.getTag());
         }
-
-        if (command.getCacheFrom() != null && !command.getCacheFrom().isEmpty()) {
-            webTarget = webTarget.queryParamsSet("cachefrom", command.getCacheFrom());
-        }
-
         if (command.getRemote() != null) {
             webTarget = webTarget.queryParam("remote", command.getRemote().toString());
         }
@@ -90,16 +85,16 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
             webTarget = webTarget.queryParam("cpusetcpus", command.getCpusetcpus());
         }
 
-        if (command.getBuildArgs() != null) {
-            webTarget = webTarget.queryParamsJsonMap("buildargs", command.getBuildArgs());
+        if (command.getBuildArgs() != null && !command.getBuildArgs().isEmpty()) {
+            try {
+                webTarget = webTarget.queryParam("buildargs", MAPPER.writeValueAsString(command.getBuildArgs()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (command.getShmsize() != null) {
             webTarget = webTarget.queryParam("shmsize", command.getShmsize());
-        }
-
-        if (command.getLabels() != null) {
-            webTarget = webTarget.queryParamsJsonMap("labels", command.getLabels());
         }
 
         LOGGER.trace("POST: {}", webTarget);

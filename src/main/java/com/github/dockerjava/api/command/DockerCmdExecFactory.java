@@ -117,7 +117,6 @@ public interface DockerCmdExecFactory extends Closeable {
 
     DisconnectFromNetworkCmd.Exec createDisconnectFromNetworkCmdExec();
 
-    // swarm
     InitializeSwarmCmd.Exec createInitializeSwarmCmdExec();
 
     InspectSwarmCmd.Exec createInspectSwarmCmdExec();
@@ -163,38 +162,23 @@ public interface DockerCmdExecFactory extends Closeable {
      */
     RemoveServiceCmd.Exec createRemoveServiceCmdExec();
 
-    // nodes
-
     /**
-     * List all nodes. Node operations require the engine to be part of a swarm
+     * Command to list all task in a docker swarm. Only applicable if docker runs in swarm mode.
      *
      * @since {@link RemoteApiVersion#VERSION_1_24}
      */
-    ListSwarmNodesCmd.Exec listSwarmNodeCmdExec();
+    ListTasksCmd.Exec createListTasksCmdExec();
 
-    /**
-     * Return low-level information on the node. Node operations require the engine to be part of a swarm
-     *
-     * @since {@link RemoteApiVersion#VERSION_1_24}
-     */
-    InspectSwarmNodeCmd.Exec inspectSwarmNodeCmdExec();
+    InspectTaskCmd.Exec createInspectTaskCmdExec();
 
-    /**
-     * Remove a node from the swarm. Node operations require the engine to be part of a swarm
-     *
-     * @since {@link RemoteApiVersion#VERSION_1_24}
-     */
-    RemoveSwarmNodeCmd.Exec removeSwarmNodeCmdExec();
+    ListSwarmNodesCmd.Exec createListSwarmNodeCmdExec();
 
-    /**
-     * Update a node. Node operations require the engine to be part of a swarm
-     *
-     * @since {@link RemoteApiVersion#VERSION_1_24}
-     */
-    UpdateSwarmNodeCmd.Exec updateSwarmNodeCmdExec();
+    InspectSwarmNodeCmd.Exec createInspectSwarmNodeExec();
 
+    RemoveSwarmNodeCmd.Exec createRemoveSwarmNodeCmdExec();
+
+    UpdateSwarmNodeCmd.Exec createUpdateSwarmNodeCmdExec();
 
     @Override
     void close() throws IOException;
-
 }

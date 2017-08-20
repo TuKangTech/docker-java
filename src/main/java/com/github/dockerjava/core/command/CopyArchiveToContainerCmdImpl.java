@@ -112,6 +112,12 @@ public class CopyArchiveToContainerCmdImpl extends AbstrDockerCmd<CopyArchiveToC
                 .append(remotePath).toString();
     }
 
+    private InputStream buildUploadStream(String hostResource, boolean dirChildrenOnly) throws IOException {
+        Path toUpload = Files.createTempFile("docker-java", ".tar.gz");
+        CompressArchiveUtil.tar(Paths.get(hostResource), toUpload, true, dirChildrenOnly);
+        return Files.newInputStream(toUpload);
+    }
+
     /**
      * @throws com.github.dockerjava.api.exception.NotFoundException
      *             No such container
@@ -124,30 +130,16 @@ public class CopyArchiveToContainerCmdImpl extends AbstrDockerCmd<CopyArchiveToC
                 throw new DockerClientException(
                         "Only one of host resource or tar input stream should be defined to perform the copy, not both");
             }
-            // create TAR package for the given path so docker can consume it
-            Path toUpload = null;
-            try {
-                toUpload = Files.createTempFile("docker-java", ".tar.gz");
-                CompressArchiveUtil.tar(Paths.get(hostResource), toUpload, true, dirChildrenOnly);
-            } catch (IOException createFileIOException) {
-                if (toUpload != null) {
-                    // remove tmp docker-javaxxx.tar.gz
-                    toUpload.toFile().delete();
-                }
-                throw new DockerClientException("Unable to perform tar on host resource " + this.hostResource, createFileIOException);
-            }
-            // send the tar stream, call exec so that the stream is consumed and then closed by try-with-resources
-            try (InputStream uploadStream = Files.newInputStream(toUpload)) {
+            // We compress the given path, call exec so that the stream is consumed and then close it our self
+            try (InputStream uploadStream = buildUploadStream(this.hostResource, this.dirChildrenOnly)) {
                 this.tarInputStream = uploadStream;
                 return super.exec();
             } catch (IOException e) {
-                throw new DockerClientException("Unable to read temp file " + toUpload.toFile().getAbsolutePath(), e);
-            } finally {
-                // remove tmp docker-javaxxx.tar.gz
-                toUpload.toFile().delete();
+                throw new DockerClientException("Unable to perform tar on host resource " + this.hostResource, e);
             }
         } else if (this.tarInputStream == null) {
-            throw new DockerClientException("One of host resource or tar input stream must be defined to perform the copy");
+            throw new DockerClientException(
+                    "One of host resource or tar input stream must be defined to perform the copy");
         }
         // User set a stream, so we will just consume it and let the user close it by him self
         return super.exec();

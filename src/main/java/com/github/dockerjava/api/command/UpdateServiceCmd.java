@@ -20,11 +20,6 @@ public interface UpdateServiceCmd extends SyncDockerCmd<Void> {
 
     UpdateServiceCmd withServiceSpec(ServiceSpec serviceSpec);
 
-    @CheckForNull
-    Long getVersion();
-
-    UpdateServiceCmd withVersion(Long version);
-
     interface Exec extends DockerCmdSyncExec<UpdateServiceCmd, Void> {
     }
 }
