@@ -3,8 +3,6 @@ package com.github.dockerjava.api.command;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import java.util.Map;
-
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.ExposedPorts;
 import com.github.dockerjava.api.model.Volumes;
@@ -30,9 +28,6 @@ public interface CommitCmd extends SyncDockerCmd<String> {
 
     @CheckForNull
     String getHostname();
-
-    @CheckForNull
-    Map<String, String> getLabels();
 
     @CheckForNull
     Integer getMemory();
@@ -92,11 +87,6 @@ public interface CommitCmd extends SyncDockerCmd<String> {
     CommitCmd withExposedPorts(ExposedPorts exposedPorts);
 
     CommitCmd withHostname(String hostname);
-
-    /**
-     * @since 1.19
-     */
-    CommitCmd withLabels(Map<String, String> labels);
 
     CommitCmd withMemory(Integer memory);
 

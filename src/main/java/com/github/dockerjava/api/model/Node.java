@@ -9,6 +9,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
+import java.io.Serializable;
+
 /**
  * A node as returned by the /events API, for instance, when Swarm is used.
  */

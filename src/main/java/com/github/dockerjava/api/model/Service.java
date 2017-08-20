@@ -61,12 +61,6 @@ public class Service implements Serializable {
     private ServiceUpdateStatus updateStatus;
 
     /**
-     * @since 1.24
-     */
-    @JsonProperty("Version")
-    private ResourceVersion version;
-
-    /**
      * @see #id
      */
     @CheckForNull
@@ -159,22 +153,6 @@ public class Service implements Serializable {
      */
     public Service withUpdateStatus(ServiceUpdateStatus updateStatus) {
         this.updateStatus = updateStatus;
-        return this;
-    }
-
-    /**
-     * @see #version
-     */
-    @CheckForNull
-    public ResourceVersion getVersion() {
-        return version;
-    }
-
-    /**
-     * @see #version
-     */
-    public Service withVersion(ResourceVersion version) {
-        this.version = version;
         return this;
     }
 

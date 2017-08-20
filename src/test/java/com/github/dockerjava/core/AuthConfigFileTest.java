@@ -64,28 +64,8 @@ public class AuthConfigFileTest {
         expected.addConfig(authConfig1);
         expected.addConfig(authConfig2);
 
-        Assert.assertEquals(runTest("validJson.json"), expected);
+        Assert.assertEquals(runTest("validJson"), expected);
 
-    }
-
-    @Test
-    public void validJsonWithUnknown() throws IOException {
-        AuthConfig authConfig1 = new AuthConfig()
-                .withEmail("foo@example.com")
-                .withUsername("foo")
-                .withPassword("bar")
-                .withRegistryAddress("quay.io");
-
-        AuthConfigFile expected = new AuthConfigFile();
-        expected.addConfig(authConfig1);
-        runTest("validJsonWithUnknown.json");
-    }
-
-    @Test
-    public void validJsonWithOnlyUnknown() throws IOException {
-        AuthConfigFile expected = new AuthConfigFile();
-        AuthConfigFile actual = runTest("validJsonWithOnlyUnknown.json");
-        Assert.assertEquals(actual, expected);
     }
 
     @Test

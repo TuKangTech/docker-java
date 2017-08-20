@@ -1,7 +1,6 @@
 package com.github.dockerjava.jaxrs;
 
 import static javax.ws.rs.client.Entity.entity;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -25,7 +24,6 @@ import com.github.dockerjava.jaxrs.async.POSTCallbackNotifier;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.Map;
 
 public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, BuildResponseItem> implements
         BuildImageCmd.Exec {
@@ -66,21 +64,9 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
         if (dockerFilePath != null && command.getRemote() == null && !"Dockerfile".equals(dockerFilePath)) {
             webTarget = webTarget.queryParam("dockerfile", dockerFilePath);
         }
-
-        if (command.getTags() != null && !command.getTags().isEmpty()) {
-            for (String t : command.getTags()) {
-                webTarget = webTarget.queryParam("t", t);
-            }
-        } else if (isNotBlank(command.getTag())) {
+        if (command.getTag() != null) {
             webTarget = webTarget.queryParam("t", command.getTag());
         }
-
-        if (command.getCacheFrom() != null) {
-            for (String c: command.getCacheFrom()) {
-               webTarget = webTarget.queryParam("cachefrom", c);
-            }
-        }
-
         if (command.getRemote() != null) {
             webTarget = webTarget.queryParam("remote", command.getRemote().toString());
         }
@@ -113,13 +99,18 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
             webTarget = webTarget.queryParam("rm", "false");
         }
 
-        webTarget = writeMap(webTarget, "buildargs", command.getBuildArgs());
+        if (command.getBuildArgs() != null && !command.getBuildArgs().isEmpty()) {
+            try {
+                webTarget = webTarget.queryParam("buildargs",
+                        URLEncoder.encode(MAPPER.writeValueAsString(command.getBuildArgs()), "UTF-8"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         if (command.getShmsize() != null) {
             webTarget = webTarget.queryParam("shmsize", command.getShmsize());
         }
-
-        webTarget = writeMap(webTarget, "labels", command.getLabels());
 
         webTarget.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
         webTarget.property(ClientProperties.CHUNKED_ENCODING_SIZE, 1024 * 1024);
@@ -131,18 +122,5 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
                 resourceWithOptionalAuthConfig(command, webTarget.request()).accept(MediaType.TEXT_PLAIN),
                 entity(command.getTarInputStream(), "application/tar")
         );
-    }
-
-    private WebTarget writeMap(WebTarget webTarget, String name, Map<String, String> value) {
-        if (value != null && !value.isEmpty()) {
-            try {
-                return webTarget.queryParam(name,
-                        URLEncoder.encode(MAPPER.writeValueAsString(value), "UTF-8"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return webTarget;
-        }
     }
 }

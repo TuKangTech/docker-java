@@ -1,28 +1,22 @@
 package com.github.dockerjava.netty.exec;
 
-import static com.github.dockerjava.utils.TestUtils.getVersion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.testng.ITestResult;
-import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
@@ -40,7 +34,6 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.Ports.Binding;
-import com.github.dockerjava.core.RemoteApiVersion;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
 import com.github.dockerjava.core.command.WaitContainerResultCallback;
@@ -92,15 +85,6 @@ public class BuildImageCmdExecTest extends AbstractNettyDockerClientTest {
     }
 
     @Test
-    public void buildImageFromTarWithDockerfileNotInBaseDirectory() throws Exception {
-        File baseDir = fileFromBuildTestResource("dockerfileNotInBaseDirectory");
-        Collection<File> files = FileUtils.listFiles(baseDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-        File tarFile = CompressArchiveUtil.archiveTARFiles(baseDir, files, UUID.randomUUID().toString());
-        String response = dockerfileBuild(new FileInputStream(tarFile), "dockerfileFolder/Dockerfile");
-        assertThat(response, containsString("Successfully executed testrun.sh"));
-    }
-
-    @Test
     public void onBuild() throws Exception {
         File baseDir = fileFromBuildTestResource("ONBUILD/parent");
 
@@ -138,11 +122,6 @@ public class BuildImageCmdExecTest extends AbstractNettyDockerClientTest {
         File baseDir = fileFromBuildTestResource("ADD/folder");
         String response = dockerfileBuild(baseDir);
         assertThat(response, containsString("Successfully executed testAddFolder.sh"));
-    }
-
-    private String dockerfileBuild(InputStream tarInputStream, String dockerFilePath) throws Exception {
-
-        return execBuild(dockerClient.buildImageCmd().withTarInputStream(tarInputStream).withDockerfilePath(dockerFilePath));
     }
 
     private String dockerfileBuild(InputStream tarInputStream) throws Exception {
@@ -274,72 +253,6 @@ public class BuildImageCmdExecTest extends AbstractNettyDockerClientTest {
         LOG.info("Image Inspect: {}", inspectImageResponse.toString());
 
         assertThat(inspectImageResponse.getConfig().getLabels().get("test"), equalTo("abc"));
-    }
-
-    @Test
-    public void labels() throws Exception {
-        if (!getVersion(dockerClient).isGreaterOrEqual(RemoteApiVersion.VERSION_1_23)) {
-            throw new SkipException("API version should be >= 1.23");
-        }
-
-        File baseDir = fileFromBuildTestResource("labels");
-
-        String imageId = dockerClient.buildImageCmd(baseDir).withNoCache(true)
-                .withLabels(Collections.singletonMap("test", "abc"))
-                .exec(new BuildImageResultCallback())
-                .awaitImageId();
-
-        InspectImageResponse inspectImageResponse = dockerClient.inspectImageCmd(imageId).exec();
-        assertThat(inspectImageResponse, not(nullValue()));
-        LOG.info("Image Inspect: {}", inspectImageResponse.toString());
-
-        assertThat(inspectImageResponse.getConfig().getLabels().get("test"), equalTo("abc"));
-    }
-
-    @Test
-    public void multipleTags() throws Exception {
-        if (!getVersion(dockerClient).isGreaterOrEqual(RemoteApiVersion.VERSION_1_21)) {
-            throw new SkipException("API version should be >= 1.21");
-        }
-
-        File baseDir = fileFromBuildTestResource("labels");
-
-        String imageId = dockerClient.buildImageCmd(baseDir).withNoCache(true)
-                .withTag("fallback-when-withTags-not-called")
-                .withTags(new HashSet<>(Arrays.asList("docker-java-test:tag1", "docker-java-test:tag2")))
-                .exec(new BuildImageResultCallback())
-                .awaitImageId();
-
-        InspectImageResponse inspectImageResponse = dockerClient.inspectImageCmd(imageId).exec();
-        assertThat(inspectImageResponse, not(nullValue()));
-        LOG.info("Image Inspect: {}", inspectImageResponse.toString());
-
-        assertThat(inspectImageResponse.getRepoTags().size(), equalTo(2));
-        assertThat(inspectImageResponse.getRepoTags(), containsInAnyOrder("docker-java-test:tag1", "docker-java-test:tag2"));
-    }
-
-    @Test
-    public void cacheFrom() throws Exception {
-    	if (!getVersion(dockerClient).isGreaterOrEqual(RemoteApiVersion.VERSION_1_25)) {
-    		throw new SkipException("API version should be >= 1.25");
-    	}
-    	File baseDir1 = fileFromBuildTestResource("CacheFrom/test1");
-    	String imageId1 = dockerClient.buildImageCmd(baseDir1)
-    			.exec(new BuildImageResultCallback())
-    			.awaitImageId();
-    	InspectImageResponse inspectImageResponse1 = dockerClient.inspectImageCmd(imageId1).exec();
-    	assertThat(inspectImageResponse1, not(nullValue()));
-    	
-    	File baseDir2 = fileFromBuildTestResource("CacheFrom/test2");
-    	String cacheImage = String.format("[\"%s\"]", imageId1);
-    	String imageId2 = dockerClient.buildImageCmd(baseDir2).withCacheFrom(new HashSet<>(Arrays.asList(cacheImage)))
-    			.exec(new BuildImageResultCallback())
-    			.awaitImageId();
-    	InspectImageResponse inspectImageResponse2 = dockerClient.inspectImageCmd(imageId2).exec();
-    	assertThat(inspectImageResponse2, not(nullValue()));
-    	
-    	// Compare whether the image2's parent layer is from image1 so that cache is used
-    	assertThat(inspectImageResponse2.getParent(), equalTo(inspectImageResponse1.getId()));    			
     }
 
     public void dockerfileNotInBaseDirectory() throws Exception {

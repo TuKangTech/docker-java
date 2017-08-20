@@ -33,9 +33,11 @@ public class ListServicesCmdExec extends AbstrSyncDockerCmdExec<ListServicesCmd,
         }
 
         LOGGER.trace("GET: {}", webTarget);
+
         List<Service> services = webTarget.request().accept(MediaType.APPLICATION_JSON)
                 .get(new GenericType<List<Service>>() {
                 });
+
         LOGGER.trace("Response: {}", services);
 
         return services;

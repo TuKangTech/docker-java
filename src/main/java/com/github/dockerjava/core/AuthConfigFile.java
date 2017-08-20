@@ -13,26 +13,19 @@ import org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.AuthConfigurations;
 
 public class AuthConfigFile {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static final TypeReference<Map<String, AuthConfig>> CONFIG_CFG_MAP_TYPE =
-        new TypeReference<Map<String, AuthConfig>>() {
-        };
-
-    private static final TypeReference<Map<String, Map<String, AuthConfig>>> CONFIG_JSON_MAP_TYPE =
-        new TypeReference<Map<String, Map<String, AuthConfig>>>() {
-        };
-    private static final String AUTHS_PROPERTY = "auths";
+    private static final TypeReference<Map<String, AuthConfig>> CONFIG_MAP_TYPE = new TypeReference<Map<String, AuthConfig>>() {
+    };
 
     private final Map<String, AuthConfig> authConfigMap;
 
     public AuthConfigFile() {
-        authConfigMap = new HashMap<>();
+        authConfigMap = new HashMap<String, AuthConfig>();
     }
 
     void addConfig(AuthConfig config) {
@@ -108,41 +101,16 @@ public class AuthConfigFile {
         if (!confFile.exists()) {
             return new AuthConfigFile();
         }
-
         Map<String, AuthConfig> configMap = null;
-        if (isJSONFile(confFile)) {
-            /*
-            Registry v2 expects config expects config.json while v2 expects .dockercfg
-            The only difference between them is that config.json wraps "auths" around the AuthConfig
-             */
-            try {
-                // try registry version 2
-                final ObjectNode node = filterNonAuthsFromJSON(confFile);
-                Map<String, Map<String, AuthConfig>> configJson = MAPPER.convertValue(node, CONFIG_JSON_MAP_TYPE);
-                if (configJson != null && !configJson.isEmpty()) {
-                    configMap = configJson.get(AUTHS_PROPERTY);
-                }
-
-            } catch (IOException e1) {
-                try {
-                    // try registry version 1
-                    configMap = MAPPER.readValue(confFile, CONFIG_CFG_MAP_TYPE);
-                } catch (IOException e2) {
-                    // we know it is JSON so it does not make sense to check for the old format
-                    // probably Docker writes some unstructured contents here, see #806
-                    // at least it is not worse than the totally absent file
-                    return new AuthConfigFile();
-                }
-            }
+        try {
+            configMap = MAPPER.readValue(confFile, CONFIG_MAP_TYPE);
+        } catch (IOException e) {
+            // pass
         }
-
         if (configMap != null) {
             for (Map.Entry<String, AuthConfig> entry : configMap.entrySet()) {
                 AuthConfig authConfig = entry.getValue();
-                final String auth = authConfig.getAuth();
-                if (auth == null) continue;
-
-                decodeAuth(auth, authConfig);
+                decodeAuth(authConfig.getAuth(), authConfig);
                 authConfig.withAuth(null);
                 authConfig.withRegistryAddress(entry.getKey());
                 configFile.addConfig(authConfig);
@@ -168,23 +136,6 @@ public class AuthConfigFile {
         }
         return configFile;
 
-    }
-
-    private static boolean isJSONFile(final File confFile) {
-        try {
-            return MAPPER.readValue(confFile, ObjectNode.class) != null;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    private static ObjectNode filterNonAuthsFromJSON(final File confFile) throws IOException {
-        final ObjectNode node = MAPPER.readValue(confFile, ObjectNode.class);
-        if (!node.has(AUTHS_PROPERTY)) {
-            throw new IOException("No Auth Config contained");
-        }
-        node.retain(AUTHS_PROPERTY);
-        return node;
     }
 
     static void decodeAuth(String auth, AuthConfig config) throws IOException {

@@ -5,6 +5,8 @@ package com.github.dockerjava.core.command;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.CheckForNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,17 +23,12 @@ public class BuildImageResultCallback extends ResultCallbackTemplate<BuildImageR
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildImageResultCallback.class);
 
-    private String imageId;
-
-    private String error;
+    @CheckForNull
+    private BuildResponseItem latestItem = null;
 
     @Override
     public void onNext(BuildResponseItem item) {
-        if (item.isBuildSuccessIndicated()) {
-            this.imageId = item.getImageId();
-        } else if (item.isErrorIndicated()) {
-            this.error = item.getError();
-        }
+        this.latestItem = item;
         LOGGER.debug(item.toString());
     }
 
@@ -68,14 +65,13 @@ public class BuildImageResultCallback extends ResultCallbackTemplate<BuildImageR
     }
 
     private String getImageId() {
-        if (imageId != null) {
-            return imageId;
-        }
-
-        if (error == null) {
+        if (latestItem == null) {
             throw new DockerClientException("Could not build image");
+        } else if (!latestItem.isBuildSuccessIndicated()) {
+            throw new DockerClientException("Could not build image: " + latestItem.getError());
+        } else {
+            return latestItem.getImageId();
         }
-
-        throw new DockerClientException("Could not build image: " + error);
     }
+
 }

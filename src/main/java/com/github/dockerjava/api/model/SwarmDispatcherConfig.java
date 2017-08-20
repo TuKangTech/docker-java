@@ -26,20 +26,20 @@ public class SwarmDispatcherConfig implements Serializable {
      * @since 1.24
      */
     @JsonProperty("HeartbeatPeriod")
-    private Long heartbeatPeriod;
+    private long heartbeatPeriod;
 
     /**
      * @see #heartbeatPeriod
      */
     @CheckForNull
-    public Long getHeartbeatPeriod() {
+    public long getHeartbeatPeriod() {
         return heartbeatPeriod;
     }
 
     /**
      * @see #heartbeatPeriod
      */
-    public SwarmDispatcherConfig withHeartbeatPeriod(Long heartbeatPeriod) {
+    public SwarmDispatcherConfig withHeartbeatPeriod(long heartbeatPeriod) {
         this.heartbeatPeriod = heartbeatPeriod;
         return this;
     }

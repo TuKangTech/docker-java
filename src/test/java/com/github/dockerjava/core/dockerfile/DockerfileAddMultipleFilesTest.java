@@ -59,12 +59,11 @@ public class DockerfileAddMultipleFilesTest {
     @Test
     public void addFiles() throws IOException {
         File baseDir = fileFromBuildTestResource("ADD/files");
-        new File(baseDir, "emptydir").mkdir();
         Dockerfile dockerfile = new Dockerfile(new File(baseDir, "Dockerfile"), baseDir);
         Dockerfile.ScannedResult result = dockerfile.parse();
         Collection<String> filesToAdd = transform(result.filesToAdd, TO_FILE_NAMES);
 
-        assertThat(filesToAdd, containsInAnyOrder("emptydir", "Dockerfile", "src1", "src2"));
+        assertThat(filesToAdd, containsInAnyOrder("Dockerfile", "src1", "src2"));
     }
 
     private File fileFromBuildTestResource(String resource) {

@@ -2,8 +2,6 @@ package com.github.dockerjava.core.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.dockerjava.api.command.CommitCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
@@ -44,12 +42,6 @@ public class CommitCmdImpl extends AbstrDockerCmd<CommitCmd, String> implements 
 
     @JsonProperty("Hostname")
     private String hostname;
-
-    /**
-     * @since 1.19
-     */
-    @JsonProperty("Labels")
-    private Map<String, String> labels;
 
     @JsonProperty("Memory")
     private Integer memory;
@@ -194,17 +186,6 @@ public class CommitCmdImpl extends AbstrDockerCmd<CommitCmd, String> implements 
     public CommitCmdImpl withEnv(String... env) {
         checkNotNull(env, "env was not specified");
         this.env = env;
-        return this;
-    }
-
-    @Override
-    public Map<String, String> getLabels() {
-        return labels;
-    }
-
-    @Override
-    public CommitCmdImpl withLabels(Map<String, String> labels) {
-        this.labels = labels;
         return this;
     }
 

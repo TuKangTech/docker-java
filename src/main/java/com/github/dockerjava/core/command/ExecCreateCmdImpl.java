@@ -26,12 +26,6 @@ public class ExecCreateCmdImpl extends AbstrDockerCmd<ExecCreateCmd, ExecCreateC
     @JsonProperty("Tty")
     private Boolean tty;
 
-    /**
-     * @since {@link RemoteApiVersion#VERSION_1_19}
-     */
-    @JsonProperty("User")
-    private String user;
-
     @JsonProperty("Cmd")
     private String[] cmd;
 
@@ -72,12 +66,6 @@ public class ExecCreateCmdImpl extends AbstrDockerCmd<ExecCreateCmd, ExecCreateC
     }
 
     @Override
-    public ExecCreateCmd withUser(String user) {
-        this.user = user;
-        return this;
-    }
-
-    @Override
     public ExecCreateCmd withCmd(String... cmd) {
         this.cmd = cmd;
         return this;
@@ -106,11 +94,6 @@ public class ExecCreateCmdImpl extends AbstrDockerCmd<ExecCreateCmd, ExecCreateC
     @Override
     public Boolean hasTtyEnabled() {
         return tty;
-    }
-
-    @Override
-    public String getUser() {
-        return user;
     }
 
     /**

@@ -20,7 +20,6 @@ import com.github.dockerjava.api.model.VolumeBinds;
 import com.github.dockerjava.api.model.VolumeRW;
 import com.github.dockerjava.api.model.VolumesRW;
 import com.github.dockerjava.core.RemoteApiVersion;
-import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  *
@@ -53,12 +52,6 @@ public class InspectContainerResponse {
 
     @JsonProperty("HostsPath")
     private String hostsPath;
-
-    /**
-     * @since {@link RemoteApiVersion#VERSION_1_17}
-     */
-    @JsonProperty("LogPath")
-    private String logPath;
 
     @JsonProperty("Id")
     private String id;
@@ -113,7 +106,7 @@ public class InspectContainerResponse {
     }
 
     public Integer getSizeRootFs() {
-        return sizeRootFs;
+        return  sizeRootFs;
     }
 
     public String getCreated() {
@@ -175,11 +168,6 @@ public class InspectContainerResponse {
         return hostsPath;
     }
 
-    @CheckForNull
-    public String getLogPath() {
-        return logPath;
-    }
-
     public String getName() {
         return name;
     }
@@ -218,7 +206,7 @@ public class InspectContainerResponse {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -302,13 +290,6 @@ public class InspectContainerResponse {
         @CheckForNull
         @JsonProperty("FinishedAt")
         private String finishedAt;
-
-
-        /**
-         * @since Docker version 1.12
-         */
-        @JsonProperty("Health")
-        private HealthState health;
 
         /**
          * See {@link #status}
@@ -396,10 +377,6 @@ public class InspectContainerResponse {
         @CheckForNull
         public String getFinishedAt() {
             return finishedAt;
-        }
-
-        public HealthState getHealth() {
-            return health;
         }
 
         @Override

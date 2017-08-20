@@ -44,7 +44,7 @@ public class ServiceSpec implements Serializable {
     /**
      * @since 1.24
      */
-    @JsonProperty("Networks")
+    @JsonProperty("Configs")
     private List<NetworkAttachmentConfig> networks;
 
     /**

@@ -1,6 +1,5 @@
 package com.github.dockerjava.netty.exec;
 
-import static com.github.dockerjava.utils.TestUtils.isNotSwarm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyString;
@@ -76,15 +75,12 @@ public class InspectContainerCmdExecTest extends AbstractNettyDockerClientTest {
         assertThat(container.getId(), not(isEmptyString()));
 
         InspectContainerCmd command = dockerClient.inspectContainerCmd(container.getId())
-                .withSize(true);
+                                                      .withSize(true);
         assertTrue(command.getSize());
-        InspectContainerResponse containerInfo = command.exec();
+        InspectContainerResponse containerInfo  = command.exec();
         assertEquals(containerInfo.getId(), container.getId());
-        // TODO check swarm
-        if (isNotSwarm(dockerClient)) {
-            assertNotNull(containerInfo.getSizeRootFs());
-            assertTrue(containerInfo.getSizeRootFs().intValue() > 0);
-        }
+        assertNotNull(containerInfo.getSizeRootFs());
+        assertTrue(containerInfo.getSizeRootFs().intValue() > 0 );
     }
 
     @Test(expectedExceptions = NotFoundException.class)

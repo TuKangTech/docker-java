@@ -79,7 +79,6 @@ public class LogConfig implements Serializable {
         GELF("gelf"),
         FLUENTD("fluentd"),
         AWSLOGS("awslogs"),
-        DB("db"), // Synology specific driver
         SPLUNK("splunk");
 
         private String type;

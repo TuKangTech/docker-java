@@ -86,9 +86,6 @@ public class ContainerConfig implements Serializable {
     @JsonProperty("WorkingDir")
     private String workingDir;
 
-    @JsonProperty("Healthcheck")
-    private HealthCheck healthCheck;
-
     @JsonIgnore
     public ExposedPort[] getExposedPorts() {
         return exposedPorts != null ? exposedPorts.getExposedPorts() : null;
@@ -412,14 +409,6 @@ public class ContainerConfig implements Serializable {
     @CheckForNull
     public String getWorkingDir() {
         return workingDir;
-    }
-
-    /**
-     * @see #healthCheck
-     */
-    @CheckForNull
-    public HealthCheck getHealthcheck() {
-        return healthCheck;
     }
 
     /**

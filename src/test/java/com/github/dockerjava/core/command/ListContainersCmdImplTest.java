@@ -1,7 +1,6 @@
 package com.github.dockerjava.core.command;
 
 import static ch.lambdaj.Lambda.filter;
-import static com.github.dockerjava.utils.TestUtils.isNotSwarm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -57,6 +56,9 @@ public class ListContainersCmdImplTest extends AbstractDockerClientTest {
     public void testListContainers() throws Exception {
 
         String testImage = "busybox";
+
+        // need to block until image is pulled completely
+        dockerClient.pullImageCmd(testImage).exec(new PullImageResultCallback()).awaitSuccess();
 
         List<Container> containers = dockerClient.listContainersCmd().withShowAll(true).exec();
         assertThat(containers, notNullValue());
@@ -162,9 +164,7 @@ public class ListContainersCmdImplTest extends AbstractDockerClientTest {
         container3 = filteredContainers.get(0);
         assertThat(container3.getCommand(), not(isEmptyString()));
         assertThat(container3.getImage(), startsWith(testImage));
-        if (isNotSwarm(dockerClient)) {
-            assertEquals(container3.getLabels(), labels);
-        }
+        assertEquals(container3.getLabels(), labels);
     }
 
 }

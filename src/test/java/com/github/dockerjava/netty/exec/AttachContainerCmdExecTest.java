@@ -6,10 +6,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -92,6 +93,8 @@ public class AttachContainerCmdExecTest extends AbstractNettyDockerClientTest {
 
         dockerClient.startContainerCmd(container.getId()).exec();
 
+        Thread.sleep(SECONDS.toMillis(10)); //wait bash initialisation
+
         InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
 
         assertTrue(inspectContainerResponse.getState().getRunning());
@@ -104,20 +107,15 @@ public class AttachContainerCmdExecTest extends AbstractNettyDockerClientTest {
             }
         };
 
-        PipedOutputStream out = new PipedOutputStream();
-        PipedInputStream in = new PipedInputStream(out);
+        InputStream stdin = new ByteArrayInputStream((snippet + "\n").getBytes());
 
         dockerClient.attachContainerCmd(container.getId())
                 .withStdErr(true)
                 .withStdOut(true)
                 .withFollowStream(true)
-                .withStdIn(in)
-                .exec(callback);
-
-        out.write((snippet + "\n").getBytes());
-        out.flush();
-
-        callback.awaitCompletion(15, SECONDS);
+                .withStdIn(stdin)
+                .exec(callback)
+                .awaitCompletion(15, SECONDS);
         callback.close();
 
         assertThat(callback.toString(), containsString(snippet));

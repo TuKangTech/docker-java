@@ -18,6 +18,12 @@ public class Swarm extends ClusterInfo {
     private SwarmJoinTokens joinTokens;
 
     /**
+     * @since 1.24
+     */
+    @JsonProperty("Spec")
+    private SwarmSpec swarmSpec;
+
+    /**
      * @see #joinTokens
      */
     @CheckForNull
@@ -31,6 +37,18 @@ public class Swarm extends ClusterInfo {
     public Swarm withJoinTokens(SwarmJoinTokens joinTokens) {
         this.joinTokens = joinTokens;
         return this;
+    }
+
+    /**
+     * @see #swarmSpec
+     */
+    @CheckForNull
+    public SwarmSpec getSwarmSpec() {
+        return swarmSpec;
+    }
+
+    public void setSwarmSpec(SwarmSpec swarmSpec) {
+        this.swarmSpec = swarmSpec;
     }
 
     @Override

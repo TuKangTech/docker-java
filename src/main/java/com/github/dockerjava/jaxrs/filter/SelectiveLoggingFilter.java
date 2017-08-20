@@ -24,7 +24,6 @@ public class SelectiveLoggingFilter extends LoggingFilter {
         Set<String> s = new HashSet<String>();
         s.add(MediaType.APPLICATION_OCTET_STREAM);
         s.add("application/tar");
-        s.add("application/x-tar");
         SKIPPED_CONTENT = Collections.unmodifiableSet(s);
     }
 
